@@ -319,3 +319,11 @@ def make_stripe_event(
     stripe: stripeapi, payload: str, sig_header: str, endpoint_secret: str
 ):
     return stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+
+
+@_as_safe_operation
+def get_customer_portal_url(stripe: stripeapi, customer_id, return_url):
+    session = stripe.billing_portal.Session.create(
+        customer=customer_id, return_url=return_url
+    )
+    return session.url

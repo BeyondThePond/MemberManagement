@@ -4,9 +4,10 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
+from django.urls import reverse
 from django.utils import formats
 from django.utils.decorators import method_decorator
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView, TemplateView, RedirectView
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.conf import settings
@@ -383,25 +384,28 @@ class PaymentsTableMixin:
 
 
 @method_decorator(require_setup_completed, name="dispatch")
-class PaymentsView(PaymentsTableMixin, TemplateView):
+class PaymentsView(PaymentsTableMixin, RedirectView):
     template_name = "payments/view.html"
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-
+    def get_redirect_url(self, *args: Any, **kwargs: Any) -> str:
+        """Redirects to the Stripe customer portal for the user"""
         customer = self.request.user.alumni.membership.customer
-        context["user"] = self.request.user
 
-        invoices, error = self.__class__.get_invoice_table(customer)
-        context["invoices"] = invoices
+        # if the user is not a member, redirect to the signup page
+        if customer is None:
+            return self.reverse("setup_signup")
 
-        if error is None:
-            methods, error = self.__class__.get_method_table(customer)
-            context["methods"] = methods
+        # otherwise, redirect to the stripe customer portal
+        portal_url = self.request.build_absolute_uri(reverse("portal"))
+        url, err = stripewrapper.get_customer_portal_url(customer, portal_url)
+        if err is not None:
+            messages.error(
+                self.request,
+                "Something went wrong when trying to redirect you to the payment portal. Please try again later or contact support. ",
+            )
+            return self.reverse("payments_view")
 
-        context["error"] = error
-
-        return context
+        return url
 
 
 @csrf_exempt
