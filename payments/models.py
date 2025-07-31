@@ -358,6 +358,43 @@ class SubscriptionInformation(AlumniComponentMixin, models.Model):
             member=alumni, start=start, end=end, subscription=subscription, tier=tier
         )
 
+    @classmethod
+    def sync_from_stripe(cls, alumni: Alumni) -> Optional[SubscriptionInformation]:
+        """Syncs the SubscriptionInformation object with data from Stripe."""
+        membership = alumni.membership
+
+        if not membership or not membership.customer:
+            return None
+
+        # Retrieve the Stripe subscription for the customer
+        stripe_subscriptions, err = stripewrapper.get_subscriptions_for_customer(
+            membership.customer
+        )
+
+        if not stripe_subscriptions:
+            return None
+
+        # Assume the first subscription is the active one
+        stripe_subscription = stripe_subscriptions[0]
+
+        # Update or create the SubscriptionInformation object
+        subscription_info, created = cls.objects.update_or_create(
+            member=alumni,
+            subscription=stripe_subscription["id"],
+            defaults={
+                "start": datetime.utcfromtimestamp(stripe_subscription["start_date"]),
+                "end": datetime.utcfromtimestamp(stripe_subscription["end_date"])
+                if stripe_subscription["end_date"]
+                else None,
+                "tier": TierField.get_tier_from_stripe_id(
+                    stripe_subscription["plan"]["id"]
+                ),
+                "external": False,
+            },
+        )
+
+        return subscription_info
+
 
 class PaymentIntent(models.Model):
     stripe_id = models.CharField(max_length=256)

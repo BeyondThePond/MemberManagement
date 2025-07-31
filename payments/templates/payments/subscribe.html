@@ -35,12 +35,12 @@
             our growing global network.
             In particular, you are supporting scholarships to Jacobs students and the many projects we have in our
             pipeline!
-            Read more in our <a href="https://jacobs-alumni.de/faq/#q10" target="_blank">FAQs</a>. 
+            Read more in our <a href="https://jacobs-alumni.de/faq/#q10" target="_blank">FAQs</a>.
         </p>
 
         <p>
                 Alumni membership can be deducted from (German) taxes.
-                For donations below 200&euro; you do not need a donation receipt from us (see the <a href="https://www.gesetze-im-internet.de/estdv_1955/__50.html" target="_blank">applicable German law</a>), you can simply use your bank statement as proof. 
+                For donations below 200&euro; you do not need a donation receipt from us (see the <a href="https://www.gesetze-im-internet.de/estdv_1955/__50.html" target="_blank">applicable German law</a>), you can simply use your bank statement as proof.
         </p>
         <p>
             If you have any questions, or need to request donation receipts for amounts larger than 200&euro;, please drop us an e-mail at <a
@@ -75,11 +75,11 @@
 
                 <div class="uk-form-controls uk-form-controls-text uk-alert-warning" uk-alert>
                     {% if updating %}
-                        You can not change tiers on this page. 
+                        You can not change tiers on this page.
                     {% else %}
-                        It is not possible to change tiers on your own at this point. 
-                        If you absolutely need to change your tier, please contact support by writing an email to <a href="mailto:support@jacobs-alumni.de">support@jacobs-alumni.de</a>. 
-                        You will be able to change tiers once you have entered payment details. 
+                        It is not possible to change tiers on your own at this point.
+                        If you absolutely need to change your tier, please contact support by writing an email to <a href="mailto:support@jacobs-alumni.de">support@jacobs-alumni.de</a>.
+                        You will be able to change tiers once you have entered payment details.
                     {% endif %}
                 </div>
             </div>
@@ -93,12 +93,12 @@
             <div id="stripe-card-elements" style='display: none; '>
 
                 <div class="uk-form-controls uk-form-controls-text uk-alert-danger" uk-alert>
-                    Due to recent changes in EU law using european credit cards is currently not recommended. 
-                    Please use a SEPA bank account if you can. 
+                    Due to recent changes in EU law using european credit cards is currently not recommended.
+                    Please use a SEPA bank account if you can.
                     If you absolutely need to use a credit card, you can email us via <a href="mailto:support@jacobs-alumni.de">support@jacobs-alumni.de</a>.
                     We are working on making credit cards available to everyone again.
                 </div>
-                
+
                 <label for="card-element" class="uk-form-label">
                     Credit or debit card *
                 </label>
@@ -111,11 +111,11 @@
             <div id="stripe-iban-elements" style='display: none; '>
 
                 <div class="uk-form-controls uk-form-controls-text uk-alert-warning" uk-alert>
-                    By providing your IBAN and confirming this payment, you are authorizing Jacobs Alumni Association and Stripe, our payment service provider, to send instructions to your bank to debit your account and your bank to debit your account in accordance with those instructions. 
-                    You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. 
+                    By providing your IBAN and confirming this payment, you are authorizing Jacobs Alumni Association and Stripe, our payment service provider, to send instructions to your bank to debit your account and your bank to debit your account in accordance with those instructions.
+                    You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank.
                     A refund must be claimed within 8 weeks starting from the date on which your account was debited.
                 </div>
-                
+
                 <label for="iban" class="uk-form-label">
                     IBAN *
                 </label>
@@ -164,28 +164,28 @@
                 <div class="uk-alert-danger" uk-alert>
                     <p>
                         Stripe is in testing mode and no real charges will be made. <br>
-                        Using real payment data is not possible in this mode. 
-                        Instead make use of <a target="_blank" href="https://stripe.com/docs/testing">Testing Card or SEPA numbers</a>. 
+                        Using real payment data is not possible in this mode.
+                        Instead make use of <a target="_blank" href="https://stripe.com/docs/testing">Testing Card or SEPA numbers</a>.
                     </p>
                 </div>
             </div>
             {% endif %}
-            
-            
+
+
 
             <div class="uk-grid uk-child-width-1-1">
                 <div>
-                    <button id="button_id_presubmit" class="uk-button uk-button-primary" disabled='disabled'>{{ next_text }}</button>
+                    <button id="button_id_presubmit" class="uk-button uk-button-primary">{{ next_text }}</button>
                 </div>
 
-                <div><br /></div>   
+                <div><br /></div>
 
                 {% if allow_go_to_starter %}
                 <div>
                     <button id="button_id_starter" class="uk-button uk-button-danger uk-button-small">No Thanks &raquo;</button>
                     <small>
-                        I don't want to enter payment details. 
-                        Take me to the free <i>Starter Tier</i> instead. 
+                        I don't want to enter payment details.
+                        Take me to the free <i>Starter Tier</i> instead.
                     </small>
                 </div>
                 {% endif %}

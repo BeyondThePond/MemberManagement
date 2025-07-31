@@ -1,6 +1,6 @@
 from __future__ import annotations
 from alumni.models import Alumni
-from typing import TypeVar, Optional, Callable, List, Any, Dict
+from typing import TypeVar, Optional, Callable, List, Any, Dict, Tuple
 
 import stripe as stripeapi
 from raven.contrib.django.raven_compat.models import client
@@ -35,7 +35,7 @@ def _safe(
 
 def _as_safe_operation(
     f: Callable[..., T]
-) -> Callable[..., (Optional[T], Optional[str])]:
+) -> Callable[..., Tuple[Optional[T], Optional[str]]]:
     """Wraps a function with _safe"""
 
     def _wrapper(*args, **kwargs):
@@ -327,3 +327,18 @@ def get_customer_portal_url(stripe: stripeapi, customer_id, return_url):
         customer=customer_id, return_url=return_url
     )
     return session.url
+
+
+@_as_safe_operation
+def get_subscriptions_for_customer(stripe: stripeapi, customer_id: str):
+    """Retrieve all subscriptions for a given customer."""
+    subscriptions = stripe.Subscription.list(customer=customer_id)
+    return [
+        {
+            "id": sub.id,
+            "start_date": sub.start_date,
+            "end_date": sub.ended_at,
+            "plan": {"id": sub.plan.id},
+        }
+        for sub in subscriptions.auto_paging_iter()
+    ]

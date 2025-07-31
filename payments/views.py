@@ -32,6 +32,8 @@ if TYPE_CHECKING:
     from typing import Dict, Any, Optional, Tuple, List
     from .models import MembershipInformation
     from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+import stripe
 
 
 class SignupView(SetupComponentView):
@@ -99,129 +101,97 @@ class SubscribeView(SetupComponentView):
     def should_setup_component(self) -> bool:
         """Check if we should setup this component"""
 
-        # by default, we are not in payment update mode
-        self.payment_update_mode = False
-        self.payment_update_error = None
-
-        # if the subscription object is not the first unset component
-        # then we shouldn't set it up right now and redirect instead
-        if not super().should_setup_component():
+        # Use Django queries to check if any active subscription exists
+        now = datetime.now()
+        if self.request.user.alumni.subscriptioninformation_set.filter(
+            start__lte=now, end__gte=now
+        ).exists():
             return False
 
-        membership = self.request.user.alumni.membership
-        desired_tier = membership.desired_tier
+        alumni = self.request.user.alumni
 
-        # if there is no desired_tier, then the subscription object is
-        # the first unset tier and we should set it up right now.
-        if desired_tier is None:
+        # Call the Stripe API with the customer ID and sync with local SubscriptionInformation
+        subscription = SubscriptionInformation.sync_from_stripe(alumni)
+
+        if subscription is None:
             return True
 
-        # we are in update_payment mode mode
-        self.payment_update_mode = True
-
-        # try updating the instance right now
-        instance, err = membership.change_tier()
-        if err is not None:
-            # abort the tier upgrade
-            membership.desired_tier = None
-            membership.save()
-
-            # and store the payment error to be displayed
-            self.payment_update_error = err
-
+        # If we now have an active subscription, we do not need to set up the component
+        if (
+            subscription.start is not None
+            and subscription.start <= now
+            and (subscription.end is None or subscription.end >= now)
+        ):
             return False
 
-        # if we don't have an instance yet, we need the user to enter payment details
-        return instance is None
-
-    def dispatch_should_not(self) -> HttpResponse:
-        if not self.payment_update_mode:
-            return super().dispatch_should_not()
-
-        if self.payment_update_error is None:
-            tier = self.request.user.alumni.membership.tier
-            messages.success(
-                self.request,
-                "Tier has been changed to {}".format(TierField.get_description(tier)),
-            )
-        else:
-            messages.error(
-                self.request,
-                "Unable to change tier: {}. Please try again or contact support. ".format(
-                    self.payment_update_error
-                ),
-            )
-
-        # if the subscription was in update mode and we shouldn't set it up
-        # then we should immediately redirect to the memebership page
-        return self.redirect_response("update_membership", reverse=True)
-
-    def dispatch_form(self, form: CancellablePaymentMethodForm) -> HttpResponse:
-        if self.payment_update_mode:
-            messages.info(
-                self.request,
-                "Please enter your payment details to complete the tier change. ",
-            )
-
-        return super().dispatch_form(form)
+        # By default, we should set up the component
+        return True
 
     def form_valid(
         self, form: CancellablePaymentMethodForm
     ) -> Optional[SubscriptionInformation]:
         """Form has been validated"""
 
-        # if the membership is the starter
+        # Create a Stripe portal session for the user to complete subscription
         membership = self.request.user.alumni.membership
-        if (
-            membership.member.category != AlumniCategoryField.REGULAR
-            and form.user_go_to_starter
-        ):
+        customer_id = membership.customer
+
+        # Build return URL to redirect back after portal session
+        return_url = self.request.build_absolute_uri(reverse("setup_subscription"))
+
+        # Determine the price ID dynamically based on the tier the user selected
+        tier = membership.tier
+        price_id_map = {
+            TierField.CONTRIBUTOR: settings.STRIPE_CONTRIBUTOR_PRICE_ID,
+            TierField.PATRON: settings.STRIPE_PATRON_PRICE_ID,
+            TierField.STARTER: settings.STRIPE_STARTER_PRICE_ID,
+        }
+        price_id = price_id_map.get(tier)
+
+        if not price_id:
             form.add_error(
                 None,
-                "Non-regular Alumni are not allowed to use the free starter tier. ",
+                "Invalid membership tier selected. Please contact support. ",
             )
             return None
 
-        # Attach the payment source to the customer
-        _, err = form.attach_to_customer(membership.customer)
+        # Create the portal session via the Stripe API directly
+        stripe.api_key = settings.STRIPE_SECRET_KEY
 
-        # if the error is not, return
-        if err is not None:
+        try:
+            session = stripe.checkout.Session.create(
+                customer=customer_id,
+                payment_method_types=["card"],
+                mode="subscription",
+                line_items=[
+                    {
+                        "price": price_id,
+                        "quantity": 1,
+                    }
+                ],
+                success_url=return_url,
+                cancel_url=return_url,
+            )
+            portal_url = session.url
+            err = None
+        except Exception as e:
+            portal_url = None
+            err = str(e)
+
+        if err is not None or not portal_url:
             form.add_error(
                 None,
-                "Something went wrong when talking to our payment service provider. Please try again later or contact support. ",
+                "Something went wrong when creating the checkout session. Please try again later or contact support. ",
             )
             return None
 
-        # we went to the starter tier
-        if not form.user_go_to_starter:
-            instance = membership.create_subscription()
-        else:
-            instance = membership.cancel_create_subscription()
+        # Redirect the user to the Stripe portal session
+        return portal_url
 
-        if instance is None:
-            form.add_error(
-                None,
-                "Something went wrong trying to create the subscription. Please try again later or contact support. ",
-            )
+    def dispatch_success(self, validated: Any) -> HttpResponse:
+        """Called on True-ish return of form_valid() with the returned value"""
 
-        return instance
-
-    def dispatch_success(self, validated: SubscriptionInformation) -> HttpResponse:
-        """called upon successful setup"""
-
-        # if this was not created from an update operation, do nothing
-        if not validated.created_from_update:
-            return super().dispatch_success(validated)
-
-        # we suceeded
-        messages.success(
-            self.request,
-            "Tier has been changed to {}".format(
-                TierField.get_description(self.request.user.alumni.membership.tier)
-            ),
-        )
-        return self.redirect_response("update_membership", reverse=True)
+        return self.redirect_response(validated, reverse=False)
 
 
 @method_decorator(require_setup_completed, name="dispatch")

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from MemberManagement import settings
+
 from .custom import CustomTextChoiceField
 
 __all__ = ["TierField"]
@@ -31,3 +33,18 @@ class TierField(CustomTextChoiceField):
     @staticmethod
     def get_stripe_id(value):
         return TierField.STRIPE_IDS[value]
+
+    @staticmethod
+    def get_tier_from_stripe_id(stripe_id: str) -> str:
+        """Maps a Stripe plan ID to a membership tier."""
+        stripe_to_tier_map = {
+            # Legacy IDs
+            "contributor-membership": "co",
+            "patron-membership": "pa",
+            "starter-membership": "st",
+            # New IDs
+            settings.STRIPE_CONTRIBUTOR_PRODUCT_ID: "co",
+            settings.STRIPE_PATRON_PRODUCT_ID: "pa",
+            settings.STRIPE_STARTER_PRODUCT_ID: "st",
+        }
+        return stripe_to_tier_map.get(stripe_id, "Unknown")
