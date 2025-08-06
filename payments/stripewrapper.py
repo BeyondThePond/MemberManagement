@@ -322,7 +322,7 @@ def make_stripe_event(
 
 
 @_as_safe_operation
-def get_customer_portal_url(stripe: stripeapi, customer_id, return_url):
+def get_customer_portal_url(stripe: stripeapi, customer_id, return_url) -> str:
     session = stripe.billing_portal.Session.create(
         customer=customer_id, return_url=return_url
     )

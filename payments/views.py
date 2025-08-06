@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from django.forms import Form
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.urls import reverse
@@ -79,7 +80,7 @@ class SignupView(SetupComponentView):
 class SubscribeView(SetupComponentView):
     setup_name = "Payment Information"
     setup_subtitle = ""
-    setup_form_class = CancellablePaymentMethodForm
+    setup_form_class = Form
     setup_next_text = "CONFIRM MEMBERSHIP & AUTHORIZE PAYMENT NOW"
 
     template_name = "payments/subscribe.html"
@@ -127,9 +128,7 @@ class SubscribeView(SetupComponentView):
         # By default, we should set up the component
         return True
 
-    def form_valid(
-        self, form: CancellablePaymentMethodForm
-    ) -> Optional[SubscriptionInformation]:
+    def form_valid(self, form: CancellablePaymentMethodForm) -> Optional[str]:
         """Form has been validated"""
 
         # Create a Stripe portal session for the user to complete subscription
@@ -188,76 +187,10 @@ class SubscribeView(SetupComponentView):
         # Redirect the user to the Stripe portal session
         return portal_url
 
-    def dispatch_success(self, validated: Any) -> HttpResponse:
+    def dispatch_success(self, validated: str) -> HttpResponse:
         """Called on True-ish return of form_valid() with the returned value"""
 
         return self.redirect_response(validated, reverse=False)
-
-
-@method_decorator(require_setup_completed, name="dispatch")
-class UpdatePaymentView(FormView):
-    template_name = "payments/subscribe.html"
-    form_class = PaymentMethodForm
-
-    def get_context_data(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
-        context = super().get_context_data(*args, **kwargs)
-        context.update(
-            {
-                "title": "Update Payment Information",
-                "updating": True,
-                "next_text": "AUTHORIZE PAYMENT NOW",
-                "alumni": self.request.user.alumni,
-                "allow_go_to_starter": False,
-            }
-        )
-        return context
-
-    def form_valid(self, form: PaymentMethodForm) -> HttpResponse:
-        # Attach the payment source to the customer
-        customer = self.request.user.alumni.membership.customer
-        _, err = form.attach_to_customer(customer)
-
-        # if the error is not, return
-        if err is not None:
-            form.add_error(
-                None,
-                "Something went wrong when talking to our payment service provider. Please try again later or contact support. ",
-            )
-            return self.form_invalid(form)
-
-        messages.success(self.request, "Payment method has been updated. ")
-
-        return self.form_invalid(form)
-
-
-@method_decorator(require_setup_completed, name="dispatch")
-class UpdateTierView(RedirectResponseMixin, FormView):
-    template_name = "payments/tier.html"
-    form_class = MembershipInformationForm
-
-    def get_context_data(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
-        context = super().get_context_data(*args, **kwargs)
-        context.update(
-            {
-                "title": "Change Membership Tier",
-                "updating": True,
-                "next_text": "Change Tier",
-                "confirm_text": "Change Tier",
-                "alumni": self.request.user.alumni,
-            }
-        )
-        return context
-
-    def form_valid(self, form: MembershipInformationForm) -> HttpResponse:
-        membership = self.request.user.alumni.membership
-
-        # update the desired tier to what the user selected
-        desired_tier = form.cleaned_data["tier"]
-        membership.desired_tier = desired_tier
-        membership.save()
-
-        # redirect to the setup_subscription page
-        return self.redirect_response("setup_subscription", reverse=True)
 
 
 class PaymentsTableMixin:
@@ -354,16 +287,14 @@ class PaymentsTableMixin:
 
 
 @method_decorator(require_setup_completed, name="dispatch")
-class PaymentsView(PaymentsTableMixin, RedirectView):
-    template_name = "payments/view.html"
-
+class PaymentsView(RedirectView):
     def get_redirect_url(self, *args: Any, **kwargs: Any) -> str:
         """Redirects to the Stripe customer portal for the user"""
         customer = self.request.user.alumni.membership.customer
 
         # if the user is not a member, redirect to the signup page
         if customer is None:
-            return self.reverse("setup_signup")
+            return reverse("setup_signup")
 
         # otherwise, redirect to the stripe customer portal
         portal_url = self.request.build_absolute_uri(reverse("portal"))
@@ -373,7 +304,7 @@ class PaymentsView(PaymentsTableMixin, RedirectView):
                 self.request,
                 "Something went wrong when trying to redirect you to the payment portal. Please try again later or contact support. ",
             )
-            return self.reverse("payments_view")
+            return reverse("portal")
 
         return url
 
