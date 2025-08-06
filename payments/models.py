@@ -383,9 +383,11 @@ class SubscriptionInformation(AlumniComponentMixin, models.Model):
             subscription=stripe_subscription["id"],
             defaults={
                 "start": datetime.utcfromtimestamp(stripe_subscription["start_date"]),
-                "end": datetime.utcfromtimestamp(stripe_subscription["end_date"])
-                if stripe_subscription["end_date"]
-                else None,
+                "end": (
+                    datetime.utcfromtimestamp(stripe_subscription["end_date"])
+                    if stripe_subscription["end_date"]
+                    else None
+                ),
                 "tier": TierField.get_tier_from_stripe_id(
                     stripe_subscription["plan"]["id"]
                 ),
