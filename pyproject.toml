@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "The Django Application for managing Jacobs University Bremen Alumni Members."
 authors = ["Tom Wiesing <tkw01536@gmail.com>", "Leonhard Kuboschek <leo@kuboschek.me>"]
 license = "GPL3"
+package-mode = false
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
