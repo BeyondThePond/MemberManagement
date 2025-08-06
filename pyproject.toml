@@ -49,6 +49,7 @@ black = {version = "^24.3.0", allow-prereleases = true}
 pre-commit = "^2.20.0"
 seleniumbase = "^4.40.8"
 django-selenium-test = "^2.0.0"
+pytest-django = "^4.11.1"
 
 [tool.pytest.ini_options]
 norecursedirs = "node_modules"
