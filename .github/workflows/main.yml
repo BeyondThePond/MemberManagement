@@ -75,7 +75,7 @@ jobs:
           env:
             SELENIUM_WEBDRIVER: ${{ matrix.browser }}
             ENABLE_GEOCACHE_TEST: '1'
-          run: poetry run pytest --timeout=300
+          run: poetry run pytest --time-limit=300
 
     smoke:
         name: Docker Smoke Test
