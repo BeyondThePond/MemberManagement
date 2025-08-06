@@ -19,19 +19,17 @@ jobs:
           uses: actions/setup-python@v5
           with:
             python-version: ${{ matrix.python }}
-            cache: 'poetry'
+
+        - name: Run 'poetry install'
+          run: |
+            pip install poetry
+            poetry install
+
         - name: Install Chrome Webdriver
           if: ${{ matrix.browser == 'chrome' }}
           run: |
-            python3 -m venv venv
-            source venv/bin/activate
-
-            pip install seleniumbase
             sudo apt-get install -y google-chrome-stable
-            seleniumbase install chromedriver
-
-            deactivate
-            rm -rf venv
+            poetry run seleniumbase install chromedriver
         - name: Install Firefox Webdriver
           if: ${{ matrix.browser == 'firefox' }}
           run: |
@@ -56,21 +54,10 @@ jobs:
             ' | sudo tee /etc/apt/preferences.d/mozilla-firefox > /dev/null
             sudo apt-get -y install firefox
 
-
-            python3 -m venv venv
-            source venv/bin/activate
-
             sudo apt-get install -y firefox
 
-            pip install seleniumbase
-            seleniumbase install geckodriver
+            poetry run seleniumbase install geckodriver
 
-            deactivate
-            rm -rf venv
-        - name: Run 'poetry install'
-          run: |
-            pip install poetry
-            poetry install
 
         - name: Install Node ${{ matrix.node }}
           uses: actions/setup-node@v1
