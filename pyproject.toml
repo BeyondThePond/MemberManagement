@@ -50,7 +50,6 @@ pre-commit = "^2.20.0"
 seleniumbase = "^4.40.8"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "MemberManagement.test_settings"
 norecursedirs = "node_modules"
 filterwarnings = """
     error
