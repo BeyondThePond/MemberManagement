@@ -70,7 +70,7 @@ jobs:
           run: yarn build
         - name: Check if 'black' has been run
           run:
-            black --exclude 'migrations' --check .
+            poetry run black --exclude 'migrations' --check .
         - name: Run 'pytest'
           env:
             SELENIUM_WEBDRIVER: ${{ matrix.browser }}
