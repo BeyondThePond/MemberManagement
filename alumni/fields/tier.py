@@ -12,16 +12,27 @@ class TierField(CustomTextChoiceField):
     CONTRIBUTOR = "co"
     PATRON = "pa"
 
-    CHOICES = (
+    CHOICES = [
         (CONTRIBUTOR, "Contributor – Standard membership for 39€ p.a."),
         (STARTER, "Starter – Free Membership for 0€ p.a."),
         (PATRON, "Patron – Premium membership for 249€ p.a."),
-    )
+    ]
 
     STRIPE_IDS = {
         CONTRIBUTOR: "contributor-membership",
         STARTER: "starter-membership",
         PATRON: "patron-membership",
+    }
+
+    STRIPE_ID_TO_TIER = {
+        # Legacy IDs
+        "contributor-membership": CONTRIBUTOR,
+        "patron-membership": PATRON,
+        "starter-membership": STARTER,
+        # New IDs
+        settings.STRIPE_CONTRIBUTOR_PRODUCT_ID: CONTRIBUTOR,
+        settings.STRIPE_PATRON_PRODUCT_ID: PATRON,
+        settings.STRIPE_STARTER_PRODUCT_ID: STARTER,
     }
 
     @staticmethod
@@ -37,14 +48,5 @@ class TierField(CustomTextChoiceField):
     @staticmethod
     def get_tier_from_stripe_id(stripe_id: str) -> str:
         """Maps a Stripe plan ID to a membership tier."""
-        stripe_to_tier_map = {
-            # Legacy IDs
-            "contributor-membership": "co",
-            "patron-membership": "pa",
-            "starter-membership": "st",
-            # New IDs
-            settings.STRIPE_CONTRIBUTOR_PRODUCT_ID: "co",
-            settings.STRIPE_PATRON_PRODUCT_ID: "pa",
-            settings.STRIPE_STARTER_PRODUCT_ID: "st",
-        }
-        return stripe_to_tier_map.get(stripe_id, "Unknown")
+
+        return TierField.STRIPE_ID_TO_TIER.get(stripe_id, "Unknown")
