@@ -8,17 +8,18 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python: ["3.10"]
-                node: ["16"]
+                python: ["3.13"]
+                node: ["18"]
                 browser: ["chrome", "firefox"]
 
         steps:
         - uses: actions/checkout@v3
 
         - name: Install Python ${{ matrix.python }}
-          uses: actions/setup-python@v4
+          uses: actions/setup-python@v5
           with:
             python-version: ${{ matrix.python }}
+            cache: 'poetry'
         - name: Install Chrome Webdriver
           if: ${{ matrix.browser == 'chrome' }}
           run: |
@@ -69,7 +70,6 @@ jobs:
         - name: Run 'poetry install'
           run: |
             pip install poetry
-            poetry config virtualenvs.create false
             poetry install
 
         - name: Install Node ${{ matrix.node }}
@@ -88,7 +88,7 @@ jobs:
           env:
             SELENIUM_WEBDRIVER: ${{ matrix.browser }}
             ENABLE_GEOCACHE_TEST: '1'
-          run: pytest --timeout=300
+          run: poetry run pytest --timeout=300
 
     smoke:
         name: Docker Smoke Test
