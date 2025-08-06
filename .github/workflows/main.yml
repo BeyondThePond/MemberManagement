@@ -76,7 +76,7 @@ jobs:
             SELENIUM_WEBDRIVER: ${{ matrix.browser }}
             ENABLE_GEOCACHE_TEST: '1'
             DJANGO_SETTINGS_MODULE: 'MemberManagement.test_settings'
-          run: poetry run pytest --time-limit=300
+          run: poetry run pytest -n 4 --time-limit=300
 
     smoke:
         name: Docker Smoke Test
