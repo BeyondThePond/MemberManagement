@@ -164,7 +164,6 @@ class SignupTestBase(IntegrationTestBase):
 
         # click and wait for page load
         btn.click()
-        self.find_element(None)
 
         # check that we went to the subscription page
         if self.__class__.expect_subscription_created:
@@ -226,7 +225,6 @@ class SignupTestBase(IntegrationTestBase):
 
         # click and wait for page load
         btn.click()
-        self.find_element(None)
 
         # check that we went to the subscription page
         if self.__class__.expect_subscription_created:
@@ -288,17 +286,16 @@ class SignupTestBase(IntegrationTestBase):
 
         # click and wait for page load
         btn.click()
-        self.find_element(None)
 
         # check that we went to the subscription page
         if self.__class__.expect_subscription_created:
             self.assert_url_equal(
-                "setup_setup",
+                "setup_subscription",
                 "Check that the user is redirected to the final setup url",
             )
         else:
             self.assert_url_equal(
-                "setup_subscription",
+                "portal_register",
                 "Check that the user is redirected to the subscription url",
             )
 

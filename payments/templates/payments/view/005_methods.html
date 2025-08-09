@@ -10,23 +10,23 @@
             <p>
                 The following payment method(s) are on file for you:
             </p>
-                
+
             <ul id="payment_methods">
                 {% for method in methods %}
                     <li id="id_payment_method_{{ forloop.counter }}">{{ method | safe }}</li>
                 {% endfor %}
             </ul>
         {% else %}
-            
+
             <p>
-                No payment methods on file. 
+                No payment methods on file.
             </p>
 
         {% endif %}
     </div>
     <div class="uk-card-footer">
         {% if user.alumni.can_update_payment %}
-            <a href="{% url 'update_subscription' %}" class="uk-button uk-button-text" id='id_update_payment'>Update Payment Method(s)</a>
+            <a href="{% url 'payments' %}" class="uk-button uk-button-text" id='id_update_payment'>Update Payment Method(s)</a>
             &middot;
         {% endif %}
         <button class="uk-button uk-button-text" uk-tooltip="To delete your payment method(s), downgrade to the Starter Tier. " disabled>Delete Payment Method(s)</button>

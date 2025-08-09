@@ -21,16 +21,12 @@ from .views import (
     SignupView,
     SubscribeView,
     PaymentsView,
-    UpdatePaymentView,
-    UpdateTierView,
     stripe_webhook,
 )
 
 urlpatterns = [
     path("membership/", SignupView.as_view(), name="setup_membership"),
-    path("change/", UpdateTierView.as_view(), name="update_membership"),
     path("subscribe/", SubscribeView.as_view(), name="setup_subscription"),
-    path("update/", UpdatePaymentView.as_view(), name="update_subscription"),
     path("webhook/", stripe_webhook, name="webhook"),
     path("", PaymentsView.as_view(), name="view_payments"),
 ]
