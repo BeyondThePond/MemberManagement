@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 # Using our own mirror to not abuse geonames.org bandwidth too much
 # DOWNLOAD_URL = "https://download.geonames.org/export/zip/allCountries.zip"
-DOWNLOAD_URL = "https://github.com/JacobsAlumni/geonames.org-mirror/releases/download/v2020.01/allCountries.zip"
+DOWNLOAD_URL = "https://github.com/BeyondThePond/geonames.org-mirror/releases/download/v2020.01/allCountries.zip"
 
 
 class Command(BaseCommand):

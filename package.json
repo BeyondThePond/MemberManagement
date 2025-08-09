@@ -1,7 +1,7 @@
 {
   "name": "member_management",
   "version": "1.0.0",
-  "repository": "git@github.com:JacobsAlumni/MemberManagement.git",
+  "repository": "git@github.com:BeyondThePond/MemberManagement.git",
   "author": "Tom Wiesing <tkw01536@gmail.com>",
   "license": "GPL3",
   "private": true,
@@ -16,7 +16,7 @@
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "css-loader": "^5.2.4",
     "d3-scale-chromatic": "^3.0.0",
-    "jacobs-alumni-style": "https://github.com/JacobsAlumni/jacobs-alumni-style.git#v1.3.0",
+    "jacobs-alumni-style": "https://github.com/BeyondThePond/jacobs-alumni-style.git#v1.3.0",
     "jquery": "^3.6.0",
     "mini-css-extract-plugin": "^1.6.0",
     "nodep-date-input-polyfill": "^5.2.0",
@@ -36,7 +36,7 @@
     "vue-template-compiler": "^2.6.11",
     "webpack": "^5.94.0",
     "webpack-cli": "^4.7.0",
-    "webpack4-bundle-tracker": "https://github.com/JacobsAlumni/webpack-bundle-tracker#v0.4.2-portal"
+    "webpack4-bundle-tracker": "https://github.com/BeyondThePond/webpack-bundle-tracker#v0.4.2-portal"
   },
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack.config.js",
