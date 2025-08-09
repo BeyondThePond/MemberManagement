@@ -33,9 +33,6 @@ SETUP_PROTECTED_URLS = (
     + [
         "registry_vote",
         "setup_membership",
-        "setup_subscription",
-        "update_subscription",
-        "view_payments",
     ]
 )
 

@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "The Django Application for managing Jacobs University Bremen Alumni Members."
 authors = ["Tom Wiesing <tkw01536@gmail.com>", "Leonhard Kuboschek <leo@kuboschek.me>"]
 license = "GPL3"
+package-mode = false
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -32,7 +34,7 @@ django-pdf-render = "^0.1.3"
 channels = "^4.0.0"
 channels-redis = "^4.1.0"
 whitenoise = "^6.2.0"
-lxml = "^4.9.1"
+lxml = "^6.0.0"
 pytz = "^2023.3"
 
 [poetry.group.dev.dependencies]
@@ -45,6 +47,21 @@ django-selenium-test = "~=2.0.0"
 [tool.poetry.group.dev.dependencies]
 black = {version = "^24.3.0", allow-prereleases = true}
 pre-commit = "^2.20.0"
+seleniumbase = "^4.40.8"
+django-selenium-test = "^2.0.0"
+pytest-django = "^4.11.1"
+pytest-env = "^1.1.5"
+
+[tool.pytest.ini_options]
+norecursedirs = "node_modules"
+filterwarnings = """
+    error
+    ignore::pytest.PytestUnraisableExceptionWarning
+    ignore::DeprecationWarning:selenium.webdriver.firefox.*
+    ignore::DeprecationWarning:django_countries.fields:5
+    ignore::DeprecationWarning:pkg_resources:2871
+"""
+env = "DJANGO_SETTINGS_MODULE=MemberManagement.test_settings"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
