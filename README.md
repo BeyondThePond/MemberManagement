@@ -1,6 +1,6 @@
 # Member Management Portal
 
-![Build Status](https://github.com/JacobsAlumni/MemberManagement/workflows/CI/badge.svg)
+![Build Status](https://github.com/BeyondThePond/MemberManagement/workflows/CI/badge.svg)
 
 The Django Application for managing Jacobs University Bremen Alumni Members.
 
@@ -91,9 +91,9 @@ See the Configuration sections of the appropriate settings to configure.
 ### Deployment via Docker
 
 It is also possible to deploy this application via [Docker](https://www.docker.com/).
-This repository is automatically built as a [GitHub Package](https://github.com/users/jacobsalumni/packages/container/package/membermanagement) for every push on the main and prod branches.
-- for the `main` branch, use `ghcr.io/jacobsalumni/membermanagement:latest`
-- for the `prod` branch, use `ghcr.io/jacobsalumni/membermanagement:prod`
+This repository is automatically built as a [GitHub Package](https://github.com/users/beyondthepond/packages/container/package/membermanagement) for every push on the main and prod branches.
+- for the `main` branch, use `ghcr.io/beyondthepond/membermanagement:latest`
+- for the `prod` branch, use `ghcr.io/beyondthepond/membermanagement:prod`
 
 For Docker purposes the configuration file `MemberManagement/docker_settings.py` is used.
 By default, it also uses a local sqlite database.
