@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: jacobsalumni/membermanagement:latest
+  IMAGE_NAME: beyondthepond/membermanagement:latest
   PLATFORMS: linux/amd64
 
 jobs:

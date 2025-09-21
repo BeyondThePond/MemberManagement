@@ -5,7 +5,7 @@ RUN git describe --always > /PORTAL_VERSION
 RUN echo "Saved version file containing '$(cat /PORTAL_VERSION)'"
 
 # image for building node dependencies
-FROM node:16-alpine AS frontend
+FROM node:18-alpine AS frontend
 
 RUN apk add --no-cache \
     git
@@ -23,7 +23,7 @@ ADD assets/ /app/assets/
 RUN yarn build
 
 # image for python
-FROM python:3.10-alpine
+FROM python:3.13-alpine
 
 # Install binary python dependencies
 RUN apk add --no-cache \

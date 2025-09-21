@@ -21,7 +21,7 @@ class GeoCacheTest(TestCase):
         if GEOCACHE_TEST_ENABLED:
             management.call_command(
                 "geocache",
-                url="https://github.com/JacobsAlumni/geonames.org-mirror/releases/download/v2020.01/allCountries.zip",
+                url="https://github.com/BeyondThePond/geonames.org-mirror/releases/download/v2020.01/allCountries.zip",
             )
 
     def test_download(self) -> None:

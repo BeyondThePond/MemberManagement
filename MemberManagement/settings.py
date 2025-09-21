@@ -251,3 +251,13 @@ except ImportError:
     pass
 
 SITE_ID = 1
+
+# Product IDs, used for reconciling local data from Stripe data
+STRIPE_CONTRIBUTOR_PRODUCT_ID = "prod_SUs3ndpRDNqw9C"
+STRIPE_PATRON_PRODUCT_ID = "prod_SUs4SFxhRtJgV5"
+STRIPE_STARTER_PRODUCT_ID = "prod_S7cQEP8uPJu675"
+
+# Exact price IDs, used for signups
+STRIPE_CONTRIBUTOR_PRICE_ID = "price_1Rc03OK8wO5tRpJk4crjyiAj"
+STRIPE_PATRON_PRICE_ID = "price_1Rc05JK8wO5tRpJkX3EvIcnA"
+STRIPE_STARTER_PRICE_ID = "price_1RDNBKK8wO5tRpJk4y3CLUAS"

@@ -18,21 +18,6 @@ MOCKED_END = MOCKED_TIME + timedelta(days=2 * 365)
 
 
 class SignupPaymentsTestBase(StripeFrontendTestMixin):
-    def test_card_ok(self) -> None:
-        self.mark_skippable()
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.assert_card_selectable()
-
-    def test_iban_ok(self) -> None:
-        self.mark_skippable()
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.assert_iban_selectable()
-
-    def test_cancel(self) -> None:
-        self.mark_skippable()
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.assert_cancel_selectable()
-
     @mock.patch("django.utils.timezone.now", mock.Mock(return_value=MOCKED_TIME))
     @mock.patch(
         "payments.stripewrapper.update_payment_method", return_value=(None, None)
