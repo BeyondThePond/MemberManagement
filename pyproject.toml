@@ -9,7 +9,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
-Django = "~=4.2.17"
+Django = "~=4.2.25"
 django-countries = "^7.5.0"
 django-cookie-law = "^2.2.0"
 django-impersonate = "^1.9.1"
