@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirec
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -47,7 +48,15 @@ def email_token_login(request: HttpRequest) -> HttpResponse:
     if res is not None:
         login(request, res)
         next_url = request.POST.get("next", None)
-        return HttpResponseRedirect(next_url)
+        # Validate the next URL to prevent open redirects
+        if next_url and url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            return HttpResponseRedirect(next_url)
+        else:
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
     else:
         return render(request, "auth/token_login.html", context={"error": True})
 
