@@ -29,6 +29,8 @@ class EmailTokenLoginRedirectTest(TestCase):
             'token': token,
             'next': '/payments/'
         })
+        # Set the host for URL validation (use testserver for test compatibility)
+        request.META['HTTP_HOST'] = 'testserver'
         
         with mock.patch('custom_auth.views.authenticate', return_value=self.user):
             with mock.patch('custom_auth.views.login'):
@@ -46,6 +48,8 @@ class EmailTokenLoginRedirectTest(TestCase):
         request = self.factory.post('/auth/magic/', {
             'token': token
         })
+        # Set the host for URL validation (use testserver for test compatibility)
+        request.META['HTTP_HOST'] = 'testserver'
         
         with mock.patch('custom_auth.views.authenticate', return_value=self.user):
             with mock.patch('custom_auth.views.login'):
@@ -64,6 +68,8 @@ class EmailTokenLoginRedirectTest(TestCase):
             'token': token,
             'next': ''
         })
+        # Set the host for URL validation (use testserver for test compatibility)
+        request.META['HTTP_HOST'] = 'testserver'
         
         with mock.patch('custom_auth.views.authenticate', return_value=self.user):
             with mock.patch('custom_auth.views.login'):
@@ -82,6 +88,8 @@ class EmailTokenLoginRedirectTest(TestCase):
             'token': token,
             'next': 'https://evil.com/phishing'
         })
+        # Set the host for URL validation (use testserver for test compatibility)
+        request.META['HTTP_HOST'] = 'testserver'
         
         with mock.patch('custom_auth.views.authenticate', return_value=self.user):
             with mock.patch('custom_auth.views.login'):
