@@ -4,9 +4,10 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, views
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -46,8 +47,8 @@ def email_token_login(request: HttpRequest) -> HttpResponse:
 
     if res is not None:
         login(request, res)
-        next_url = request.POST.get("next", None)
-        return HttpResponseRedirect(next_url)
+        next_url = request.POST.get("next", settings.LOGIN_REDIRECT_URL)
+        return redirect(next_url)
     else:
         return render(request, "auth/token_login.html", context={"error": True})
 
@@ -77,6 +78,8 @@ class ClientIdLoginView(views.LoginView):
     def get_context_data(self, **kwargs):
         context = super(views.LoginView, self).get_context_data(**kwargs)
         context["googlefail"] = self.request.GET.get("error", "") == "googlefail"
+        context["next"] = self.request.GET.get("next", settings.LOGIN_REDIRECT_URL)
+
         context.update(self.extra_context)
 
         return context
