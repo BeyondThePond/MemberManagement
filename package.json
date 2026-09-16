@@ -5,6 +5,11 @@
   "author": "Tom Wiesing <tkw01536@gmail.com>",
   "license": "GPL3",
   "private": true,
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": ">=24 <25",
+    "yarn": ">=1.22 <2"
+  },
   "dependencies": {
     "@types/c3": "^0.7.6",
     "@types/d3-scale-chromatic": "^3.0.0",
