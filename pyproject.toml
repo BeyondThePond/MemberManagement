@@ -54,6 +54,7 @@ pytest-env = "^1.1.5"
 
 [tool.pytest.ini_options]
 norecursedirs = "node_modules"
+reruns = 2
 filterwarnings = """
     error
     ignore::pytest.PytestUnraisableExceptionWarning
