@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 from django.forms import Form
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.urls import reverse
+from django.utils import timezone
 from django.utils import formats
 from django.utils.decorators import method_decorator
 from django.views.generic import FormView, TemplateView, RedirectView
@@ -103,7 +102,7 @@ class SubscribeView(SetupComponentView):
         """Check if we should setup this component"""
 
         # Use Django queries to check if any active subscription exists
-        now = datetime.now()
+        now = timezone.now()
         if self.request.user.alumni.subscriptioninformation_set.filter(
             start__lte=now, end__gte=now
         ).exists():

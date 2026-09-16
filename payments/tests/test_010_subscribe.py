@@ -1,287 +1,66 @@
 from __future__ import annotations
 
-from datetime import timedelta
 from unittest import mock
 
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from datetime import timezone, datetime, datetime
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.urls import reverse
 
-from MemberManagement.tests.integration import IntegrationTest
-from payments.models import SubscriptionInformation
-
-from .stripefrontend import StripeFrontendTestMixin
-
-from alumni.fields import TierField
-
-MOCKED_TIME = datetime(2019, 9, 19, 16, 41, 17, 40, tzinfo=timezone.utc)
-MOCKED_END = MOCKED_TIME + timedelta(days=2 * 365)
+User = get_user_model()
 
 
-class SignupPaymentsTestBase(StripeFrontendTestMixin):
-    @mock.patch("django.utils.timezone.now", mock.Mock(return_value=MOCKED_TIME))
-    @mock.patch(
-        "payments.stripewrapper.update_payment_method", return_value=(None, None)
-    )
-    @mock.patch(
-        "payments.stripewrapper.create_subscription", return_value=("sub_fake", None)
-    )
-    def test_signup_card_ok(self, cmock: mock.Mock, umock: mock.Mock) -> None:
-        self.mark_skippable()
+class SubscribeCheckoutTestBase:
+    user = "Mounfem"
+    expected_price_id = None
 
-        # fill out and submit card details
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.submit_card_details()
+    def setUp(self) -> None:
+        self.user_obj = User.objects.get(username=self.user)
+        self.client.force_login(self.user_obj)
 
-        # check that things are as expected
-        self.assert_url_equal(
-            "setup_setup", "Check that the user gets redirected to the completed page"
+    def test_signup_checkout_page_renders(self) -> None:
+        response = self.client.get(reverse("setup_subscription"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "button_id_presubmit")
+
+    @mock.patch("payments.views.stripe.checkout.Session.create")
+    def test_signup_redirects_to_stripe_checkout(self, checkout_create: mock.Mock):
+        checkout_create.return_value = mock.Mock(
+            url="https://checkout.stripe.test/session"
         )
 
-        # check that the mocks were called
-        umock.assert_has_calls(
-            [mock.call(self.user.alumni.membership.customer, "", "fake-token-id")]
+        response = self.client.post(reverse("setup_subscription"), {"checkout": "1"})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "https://checkout.stripe.test/session")
+        checkout_create.assert_called_once()
+        call_kwargs = checkout_create.call_args.kwargs
+        self.assertEqual(
+            call_kwargs["customer"], self.user_obj.alumni.membership.customer
         )
-        cmock.assert_has_calls(
-            [
-                mock.call(
-                    self.user.alumni.membership.customer,
-                    self.__class__.subscribe_field_value,
-                )
-            ]
-        )
-
-        # check that the subscription object was created
-        subscription = self.user.alumni.subscription
-        self.assertEqual(subscription.start, MOCKED_TIME)
-        self.assertEqual(subscription.end, None)
-        self.assertEqual(subscription.subscription, "sub_fake")
-        self.assertEqual(subscription.external, False)
-        self.assertEqual(subscription.tier, self.user.alumni.membership.tier)
-
-    @mock.patch("django.utils.timezone.now", mock.Mock(return_value=MOCKED_TIME))
-    @mock.patch(
-        "payments.stripewrapper.update_payment_method",
-        return_value=(None, Exception("Debug failure")),
-    )
-    @mock.patch(
-        "payments.stripewrapper.create_subscription", return_value=("sub_fake", None)
-    )
-    def test_signup_card_error_update_method(
-        self, cmock: mock.Mock, umock: mock.Mock
-    ) -> None:
-        self.mark_skippable()
-
-        # fill out and submit card details
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.submit_card_details()
-
-        # check that things are as expected
-        self.assert_url_equal(
-            "setup_subscription", "Check that the user stays on the first page"
+        self.assertEqual(
+            call_kwargs["line_items"],
+            [{"price": self.expected_price_id, "quantity": 1}],
         )
 
-        # check that only the first mock was called
-        umock.assert_has_calls(
-            [mock.call(self.user.alumni.membership.customer, "", "fake-token-id")]
-        )
-        cmock.assert_not_called()
+    @mock.patch("payments.views.stripe.checkout.Session.create")
+    def test_signup_checkout_error_stays_on_page(self, checkout_create: mock.Mock):
+        checkout_create.side_effect = Exception("Debug failure")
 
-        # check that the subscription object was not created
-        with self.assertRaises(SubscriptionInformation.DoesNotExist):
-            SubscriptionInformation.objects.get(member=self.user.alumni)
+        response = self.client.post(reverse("setup_subscription"), {"checkout": "1"})
 
-    @mock.patch("django.utils.timezone.now", mock.Mock(return_value=MOCKED_TIME))
-    @mock.patch(
-        "payments.stripewrapper.update_payment_method", return_value=(None, None)
-    )
-    @mock.patch(
-        "payments.stripewrapper.create_subscription",
-        return_value=(None, Exception("Debug Error")),
-    )
-    def test_signup_card_error_create_subscription(
-        self, cmock: mock.Mock, umock: mock.Mock
-    ) -> None:
-        self.mark_skippable()
-
-        # fill out and submit card details
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.submit_card_details()
-
-        # check that things are as expected
-        self.assert_url_equal(
-            "setup_subscription", "Check that the user stays on the subscribe page"
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, "Something went wrong when creating the checkout session"
         )
 
-        # check that only the first mock was called
-        umock.assert_has_calls(
-            [mock.call(self.user.alumni.membership.customer, "", "fake-token-id")]
-        )
-        cmock.assert_has_calls(
-            [
-                mock.call(
-                    self.user.alumni.membership.customer,
-                    self.__class__.subscribe_field_value,
-                )
-            ]
-        )
 
-        # check that the subscription object was not created
-        with self.assertRaises(SubscriptionInformation.DoesNotExist):
-            SubscriptionInformation.objects.get(member=self.user.alumni)
-
-    @mock.patch("django.utils.timezone.now", mock.Mock(return_value=MOCKED_TIME))
-    @mock.patch(
-        "payments.stripewrapper.update_payment_method", return_value=(None, None)
-    )
-    @mock.patch(
-        "payments.stripewrapper.create_subscription", return_value=("sub_fake", None)
-    )
-    def test_signup_sepa(self, cmock: mock.Mock, umock: mock.Mock) -> None:
-        self.mark_skippable()
-
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.submit_sepa_details()
-
-        # check that things are as expected
-        self.assert_url_equal(
-            "setup_setup", "Check that the user gets redirected to the completed page"
-        )
-
-        # check that the mocks were called
-        umock.assert_has_calls(
-            [mock.call(self.user.alumni.membership.customer, "fake-source-id", "")]
-        )
-        cmock.assert_has_calls(
-            [
-                mock.call(
-                    self.user.alumni.membership.customer,
-                    self.__class__.subscribe_field_value,
-                )
-            ]
-        )
-
-        # check that the subscription object was created
-        subscription = self.user.alumni.subscription
-        self.assertEqual(subscription.start, MOCKED_TIME)
-        self.assertEqual(subscription.end, None)
-        self.assertEqual(subscription.subscription, "sub_fake")
-        self.assertEqual(subscription.external, False)
-        self.assertEqual(subscription.tier, self.user.alumni.membership.tier)
-
-    @mock.patch("django.utils.timezone.now", mock.Mock(return_value=MOCKED_TIME))
-    @mock.patch(
-        "payments.stripewrapper.update_payment_method",
-        return_value=(None, Exception("Debug failure")),
-    )
-    @mock.patch(
-        "payments.stripewrapper.create_subscription", return_value=("sub_fake", None)
-    )
-    def test_signup_sepa_error_update_method(
-        self, cmock: mock.Mock, umock: mock.Mock
-    ) -> None:
-        self.mark_skippable()
-
-        # fill out and submit sepa details
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.submit_sepa_details()
-
-        # check that things are as expected
-        self.assert_url_equal(
-            "setup_subscription", "Check that the user stays on the first page"
-        )
-
-        # check that only the first mock was called
-        umock.assert_has_calls(
-            [mock.call(self.user.alumni.membership.customer, "fake-source-id", "")]
-        )
-        cmock.assert_not_called()
-
-        # check that the subscription object was not created
-        with self.assertRaises(SubscriptionInformation.DoesNotExist):
-            SubscriptionInformation.objects.get(member=self.user.alumni)
-
-    @mock.patch("django.utils.timezone.now", mock.Mock(return_value=MOCKED_TIME))
-    @mock.patch(
-        "payments.stripewrapper.update_payment_method", return_value=(None, None)
-    )
-    @mock.patch(
-        "payments.stripewrapper.create_subscription",
-        return_value=(None, Exception("Debug Error")),
-    )
-    def test_signup_sepa_error_create_subscription(
-        self, cmock: mock.Mock, umock: mock.Mock
-    ) -> None:
-        self.mark_skippable()
-
-        # fill out and submit card details
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.submit_sepa_details()
-
-        # check that things are as expected
-        self.assert_url_equal(
-            "setup_subscription", "Check that the user stays on the subscribe page"
-        )
-
-        # check that only the first mock was called
-        umock.assert_has_calls(
-            [mock.call(self.user.alumni.membership.customer, "fake-source-id", "")]
-        )
-        cmock.assert_has_calls(
-            [
-                mock.call(
-                    self.user.alumni.membership.customer,
-                    self.__class__.subscribe_field_value,
-                )
-            ]
-        )
-
-        # check that the subscription object was not created
-        with self.assertRaises(SubscriptionInformation.DoesNotExist):
-            SubscriptionInformation.objects.get(member=self.user.alumni)
-
-    @mock.patch("django.utils.timezone.now", mock.Mock(return_value=MOCKED_TIME))
-    @mock.patch(
-        "payments.stripewrapper.update_payment_method", return_value=(None, None)
-    )
-    @mock.patch("payments.stripewrapper.create_subscription", return_value=(None, None))
-    def test_signup_cancel(self, cmock: mock.Mock, umock: mock.Mock) -> None:
-        self.mark_skippable()
-
-        self.load_live_url("setup_subscription", "#id_payment_type")
-        self.submit_cancel()
-
-        # check that things are as expected
-        self.assert_url_equal(
-            "setup_setup", "Check that the user gets redirected to the completed page"
-        )
-
-        # check that the mocks were called
-        umock.assert_not_called()
-        cmock.assert_not_called()
-
-        # check that we are on the right tier
-        self.assertEqual(self.user.alumni.membership.tier, TierField.STARTER)
-
-        # check that the subscription object was created
-        subscription = self.user.alumni.subscription
-        self.assertEqual(subscription.start, MOCKED_TIME)
-        self.assertEqual(subscription.end, MOCKED_END)
-        self.assertEqual(subscription.subscription, None)
-        self.assertEqual(subscription.external, False)
-        self.assertEqual(subscription.tier, TierField.STARTER)
-
-
-class ContributorSubscribeTest(
-    SignupPaymentsTestBase, IntegrationTest, StaticLiveServerTestCase
-):
+class ContributorSubscribeTest(SubscribeCheckoutTestBase, TestCase):
     fixtures = ["registry/tests/fixtures/signup_07b_contributor.json"]
-    user = "Mounfem"
-    subscribe_field_value = "contributor-membership"
+    expected_price_id = settings.STRIPE_CONTRIBUTOR_PRICE_ID
 
 
-class PatronSubscribeTest(
-    SignupPaymentsTestBase, IntegrationTest, StaticLiveServerTestCase
-):
+class PatronSubscribeTest(SubscribeCheckoutTestBase, TestCase):
     fixtures = ["registry/tests/fixtures/signup_07c_patron.json"]
-    user = "Mounfem"
-    subscribe_field_value = "patron-membership"
+    expected_price_id = settings.STRIPE_PATRON_PRICE_ID
