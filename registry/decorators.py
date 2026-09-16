@@ -44,7 +44,7 @@ def require_alumni(view: Callable[..., HttpResponse]) -> Callable[..., HttpRespo
 
 
 def require_setup_completed(
-    view: Callable[..., HttpResponse]
+    view: Callable[..., HttpResponse],
 ) -> Callable[..., HttpResponse]:
     """A decorator for views that ensures that and alumni has setup all components"""
 
