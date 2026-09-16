@@ -50,6 +50,10 @@ class AtlasSettings(AlumniComponentMixin, models.Model):
         help_text="Secret Search Text that the member can be found with",
     )
 
+    @classmethod
+    def component_exists(cls, alumni: Alumni) -> bool:
+        return True
+
 
 class GeoLocation(models.Model):
     """Represents a (cached) GeoLocation"""

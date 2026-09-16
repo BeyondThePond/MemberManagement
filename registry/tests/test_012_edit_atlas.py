@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import pytest
+import unittest
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 from MemberManagement.tests.integration import IntegrationTest
 
+pytestmark = pytest.mark.skip(reason="Atlas is no longer used.")
 
+
+@unittest.skip("Atlas is no longer used.")
 class EditAtlasTest(IntegrationTest, StaticLiveServerTestCase):
     fixtures = ["registry/tests/fixtures/integration.json"]
     user = "Mounfem"
