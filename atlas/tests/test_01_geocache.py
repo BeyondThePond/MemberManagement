@@ -6,11 +6,14 @@ from alumni.models import Address
 from django.core import management
 import os
 
+import pytest
 import unittest
 
 GEOCACHE_TEST_ENABLED = os.environ.get("ENABLE_GEOCACHE_TEST", "0") == "1"
+pytestmark = pytest.mark.skip(reason="Atlas is no longer used.")
 
 
+@unittest.skip("Atlas is no longer used.")
 class GeoCacheTest(TestCase):
     fixtures = ["registry/tests/fixtures/integration.json"]
 

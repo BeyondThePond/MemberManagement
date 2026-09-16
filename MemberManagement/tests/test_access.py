@@ -113,13 +113,13 @@ class AccessTest(IntegrationTest, StaticLiveServerTestCase):
                 url, "setup_skills", "{} is protected by setup".format(url)
             )
 
-    def test_setup_atlas(self) -> None:
+    def test_setup_membership_without_atlas(self) -> None:
         self.load_fixture("registry/tests/fixtures/signup_05_skills.json")
         self.login("Mounfem")
 
         for url in SETUP_PROTECTED_URLS:
             self.assert_url_follow(
-                url, "setup_atlas", "{} is protected by setup".format(url)
+                url, "setup_membership", "{} is protected by setup".format(url)
             )
 
     def test_setup_tier(self) -> None:

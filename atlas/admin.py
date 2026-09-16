@@ -4,7 +4,6 @@ from django.contrib import admin
 
 from .models import GeoLocation, AtlasSettings
 
-
 # Register your models here.
 
 

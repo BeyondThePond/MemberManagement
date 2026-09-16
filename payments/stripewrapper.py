@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 def _safe(
-    operation: Callable[[stripeapi], T]
+    operation: Callable[[stripeapi], T],
 ) -> Callable[[T], (Optional[T], Optional[str])]:
     """Performs a potentially unsafe operation that interacts with the stripe api"""
 
@@ -34,7 +34,7 @@ def _safe(
 
 
 def _as_safe_operation(
-    f: Callable[..., T]
+    f: Callable[..., T],
 ) -> Callable[..., Tuple[Optional[T], Optional[str]]]:
     """Wraps a function with _safe"""
 

@@ -44,7 +44,7 @@ python manage.py migrate
 Afterwards install the frontend dependencies using [yarn](https://yarnpkg.com/):
 
 ```bash
-yarn
+corepack yarn install
 ```
 
 Note that this is only tested using the NodeJS version specified in `.tool-versions`.
@@ -54,7 +54,7 @@ By default a local instance is then configured to store data in a local `db.sqli
 One needs to start the django app in two parts, one part building the frontend dependencies using:
 
 ```bash
-yarn dev
+corepack yarn dev
 ```
 
 and in a seperate terminal the normal django development server:
@@ -140,7 +140,7 @@ The integration tests run headless by default and support the following browsers
 To run tests make sure that development dependencies are installed and then run:
 
 ```
-yarn build # ensure that static assets have been built
+corepack yarn build # ensure that static assets have been built
 pytest # to run the tests
 ```
 
@@ -148,7 +148,7 @@ By default, the tests are running in headless mode.
 To enforce a visible browser, instead use:
 
 ```bash
-yarn build # ensure that static assets have been built
+corepack yarn build # ensure that static assets have been built
 SELENIUM_HEADLESS=0 pytest # to run headless
 ```
 
@@ -156,7 +156,7 @@ When offline Stripe frontend tests might fail because they require a connection 
 To work around this, you can set the `SKIP_STRIPE_TESTS` variable as follows:
 
 ```bash
-yarn build
+corepack yarn build
 SKIP_STRIPE_TESTS=1 pytest
 ```
 

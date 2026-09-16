@@ -9,11 +9,11 @@ jobs:
         strategy:
             matrix:
                 python: ["3.13"]
-                node: ["18"]
+                node: ["24.21.0"]
                 browser: ["chrome", "firefox"]
 
         steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
 
         - name: Install Python ${{ matrix.python }}
           uses: actions/setup-python@v5
@@ -60,14 +60,14 @@ jobs:
 
 
         - name: Install Node ${{ matrix.node }}
-          uses: actions/setup-node@v1
+          uses: actions/setup-node@v4
           with:
             node-version: ${{ matrix.node }}
         - name: Run 'yarn install'
-          run: yarn install
+          run: corepack yarn install --frozen-lockfile
 
         - name: Run 'yarn build'
-          run: yarn build
+          run: corepack yarn build
         - name: Check if 'black' has been run
           run:
             poetry run black --exclude 'migrations' --check .
@@ -82,7 +82,7 @@ jobs:
         name: Docker Smoke Test
         runs-on: ubuntu-latest
         steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
 
         - name: 'Build Docker Container'
           run: docker build -t jacobsalumni/membermanagement .

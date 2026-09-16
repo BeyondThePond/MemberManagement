@@ -1,0 +1,42 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url 'admin:alumni_alumni_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; {{ title }}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="module aligned">
+                <div class="form-row">
+                    <label class="required" for="id_csv">CSV file:</label>
+                    <input type="file" name="csv" id="id_csv" accept=".csv,text/csv" required>
+                </div>
+                <div class="form-row">
+                    <label for="id_columns">Columns:</label>
+                    <input type="text" name="columns" id="id_columns" value="{{ default_columns }}" class="vTextField">
+                    <div class="help">
+                        The first CSV row is treated as a header. Use an empty column name to ignore a CSV column.
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label for="id_no_stripe">Skip Stripe:</label>
+                    <input type="checkbox" name="no_stripe" id="id_no_stripe">
+                    <div class="help">
+                        Validate first, then import. If validation fails, no users are imported and an error CSV is downloaded.
+                    </div>
+                </div>
+            </fieldset>
+            <div class="submit-row">
+                <input type="submit" value="Upload and import" class="default">
+            </div>
+        </form>
+    </div>
+{% endblock %}
