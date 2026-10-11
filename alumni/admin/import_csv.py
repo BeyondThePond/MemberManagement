@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import csv
-from io import TextIOWrapper
 
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import path
 
-from registry.management.commands.import_csv import DEFAULT_COLUMNS, import_csv_rows
+from registry.management.commands.import_csv import (
+    DEFAULT_COLUMNS,
+    columns_from_header,
+    import_csv_rows,
+    read_import_rows,
+)
 
 
 class AlumniCsvImport:
@@ -30,27 +34,24 @@ class AlumniCsvImport:
             no_stripe = request.POST.get("no_stripe") == "on"
 
             if upload is None:
-                messages.error(request, "Choose a CSV file to import.")
+                messages.error(request, "Choose a CSV or XLSX file to import.")
             else:
                 try:
                     return self.import_csv_upload(request, upload, columns, no_stripe)
                 except Exception as e:
-                    messages.error(request, "CSV import failed: {}".format(e))
+                    messages.error(request, "Import failed: {}".format(e))
 
         context = {
             **self.admin_site.each_context(request),
             "opts": self.model._meta,
-            "title": "Import alumni CSV",
+            "title": "Import alumni CSV/XLSX",
             "default_columns": DEFAULT_COLUMNS,
         }
         return render(request, "admin/alumni/alumni/import_csv.html", context)
 
     def import_csv_upload(self, request, upload, columns, no_stripe):
-        reader = csv.reader(
-            TextIOWrapper(upload.file, encoding="utf-8-sig", newline="")
-        )
-        header = next(reader, [])
-        rows = list(reader)
+        header, rows = read_import_rows(upload.file, upload.name)
+        columns = columns_from_header(header) or columns
 
         check = import_csv_rows(rows, columns, no_stripe=True, simulate=True)
         if check.failures:

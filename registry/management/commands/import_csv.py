@@ -3,7 +3,10 @@ from __future__ import annotations
 import csv
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
+from io import TextIOWrapper
+
+from openpyxl import load_workbook
 
 from alumni.fields import (
     AlumniCategoryField,
@@ -31,6 +34,14 @@ from alumni.utils import CSVParser
 
 DEFAULT_COLUMNS = ",birthday_de,title,name_2,name_1,name_3,nationality_1,nationality_2,email,class,degree,major"
 REQUIRED_TARGETS = ["given_name", "family_name", "email", "birthday"]
+HEADER_ALIASES = {
+    "first name": "name_1",
+    "last name": "name_2",
+    "birthday": "birthday",
+    "nationality": "nationality_1",
+    "gender": "sex",
+    "email": "email",
+}
 
 
 @dataclass
@@ -64,6 +75,7 @@ class AlumniParser(CSVParser):
         self.register(["birthday_us"], "birthday", self._parse_birthday_us)
         self.register(["birthday_dmy_us"], "birthday", self._parse_birthday_dmy_us)
         self.register(["birthday_excel"], "birthday", self._parse_birthday_excel)
+        self.register(["birthday"], "birthday", self._parse_birthday)
         self.register(["title"], "gender", self._parse_title)
         self.register(["name_1_3"], "given_name", self._parse_given_name)
         self.register(["name_1_3"], "middle_name", self._parse_middle_name)
@@ -95,6 +107,19 @@ class AlumniParser(CSVParser):
     def _parse_birthday_dmy_us(self, birthday_dmy_us) -> datetime:
         return datetime.strptime(birthday_dmy_us, "%d/%m/%Y")
 
+    def _parse_birthday(self, birthday) -> date:
+        if isinstance(birthday, datetime):
+            return birthday.date()
+        if isinstance(birthday, date):
+            return birthday
+        birthday = birthday.strip()
+        for fmt in ("%d.%m.%Y", "%Y-%m-%d", "%m/%d/%y", "%d/%m/%Y"):
+            try:
+                return datetime.strptime(birthday, fmt).date()
+            except ValueError:
+                pass
+        raise Exception("Unknown birthday format: {}".format(birthday))
+
     def _parse_title(self, title: str) -> GenderField:
         title = title.lower().strip()
         if title == "mr.":
@@ -106,9 +131,9 @@ class AlumniParser(CSVParser):
 
     def _parse_sex(self, sex: str) -> GenderField:
         sex = sex.lower().strip()
-        if sex == "ma":
+        if sex in ("ma", "m", "male"):
             return GenderField.MALE
-        elif sex == "fe":
+        elif sex in ("fe", "f", "female", "w"):
             return GenderField.FEMALE
 
         return GenderField.UNSPECIFIED
@@ -131,11 +156,13 @@ class AlumniParser(CSVParser):
         return value.split(" ")[-1]
 
     def _parse_required(self, value: str) -> str:
+        value = value.strip()
         if value == "":
             raise Exception("Missing required value")
         return value
 
     def _parse_optional(self, value: str) -> Optional[str]:
+        value = value.strip()
         if value == "":
             return None
         return value
@@ -153,6 +180,7 @@ class AlumniParser(CSVParser):
         nationalities = countries.split(",")
 
     def _parse_country(self, country: str) -> Optional[CountryField]:
+        country = country.strip()
         if country == "":
             return None
 
@@ -250,6 +278,40 @@ class AlumniParser(CSVParser):
 
 class SimulateException(Exception):
     pass
+
+
+def columns_from_header(header: List[str]) -> Optional[List[str]]:
+    parser = AlumniParser()
+    known_fields = set(parser._fieldmap)
+    columns = [
+        HEADER_ALIASES.get(str(column or "").strip().lower(), str(column or "").strip())
+        for column in header
+    ]
+    if all(column == "" or column in known_fields for column in columns):
+        return columns
+    return None
+
+
+def _xlsx_value(value):
+    if value is None:
+        return ""
+    return value
+
+
+def read_import_rows(file, filename: str):
+    if filename.lower().endswith(".xlsx"):
+        workbook = load_workbook(file, read_only=True, data_only=True)
+        sheet = workbook.active
+        rows = [
+            [_xlsx_value(value) for value in row]
+            for row in sheet.iter_rows(values_only=True)
+            if any(value not in (None, "") for value in row)
+        ]
+        return (rows[0], rows[1:]) if rows else ([], [])
+
+    reader = csv.reader(TextIOWrapper(file, encoding="utf-8-sig", newline=""))
+    header = next(reader, [])
+    return header, list(reader)
 
 
 def create_alumni_from_row(person: Dict, targets: List[str], skip_stripe: bool):
@@ -402,17 +464,10 @@ class Command(BaseCommand):
         if len(files) != 1:
             raise Exception("expected exactly one file")
 
-        # read the csv lines!
-        lines: List[List[str]] = []
-        with open(files[0], "r") as f:
-            # open the csv file and skip the first line
-            reader = csv.reader(f)
-            next(reader, None)
+        with open(files[0], "rb") as f:
+            header, lines = read_import_rows(f, files[0])
 
-            # store the rest of the lines
-            lines = list(reader)
-
-        columns = kwargs["columns"].split(",")
+        columns = columns_from_header(header) or kwargs["columns"].split(",")
         simulate = kwargs["simulate"]
         result = import_csv_rows(
             lines,
