@@ -30,33 +30,12 @@ jobs:
           run: |
             sudo apt-get install -y google-chrome-stable
             poetry run seleniumbase install chromedriver
-        - name: Install Firefox Webdriver
+        - name: Use runner Firefox Webdriver
           if: ${{ matrix.browser == 'firefox' }}
           run: |
-            # Python by default installs from snap.
-            # This isn't supported by geckodriver.
-            #
-            # The clean solution would be to use a sane distribution
-            # that doesn't use snap-based firefox by default.
-            # But GitHub Actions doesn't offer this.
-
-            sudo add-apt-repository ppa:mozillateam/ppa
-            sudo apt-get -qq -y update
-
-            echo '
-            Package: *
-            Pin: release o=LP-PPA-mozillateam
-            Pin-Priority: 1001
-
-            Package: firefox
-            Pin: version 1:1snap1-0ubuntu2
-            Pin-Priority: -1
-            ' | sudo tee /etc/apt/preferences.d/mozilla-firefox > /dev/null
-            sudo apt-get -y install firefox
-
-            sudo apt-get install -y firefox
-
-            poetry run seleniumbase install geckodriver
+            firefox --version
+            "$GECKOWEBDRIVER/geckodriver" --version
+            echo "SE_GECKODRIVER=$GECKOWEBDRIVER/geckodriver" >> "$GITHUB_ENV"
 
 
         - name: Install Node ${{ matrix.node }}
