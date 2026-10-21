@@ -241,3 +241,5 @@ media
 
 # emails for dev
 /emails**
+# local codex workspace
+.codex/

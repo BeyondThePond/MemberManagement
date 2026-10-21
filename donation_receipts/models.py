@@ -129,7 +129,9 @@ For bank accounts, use the SEPA transfer ID. For other payment sources, leave a 
 
     @property
     def download_filename(self):
-        return "JAA Donation Receipt {date}.pdf".format(date=self.received_on)
+        return "Beyond the Pond Donation Receipt {date}.pdf".format(
+            date=self.received_on
+        )
 
 
 def _get_donating_alum(stripe_customer_id):
@@ -221,7 +223,7 @@ def _maybe_email_donation_receipt(sender, instance, created, **kwargs):
     if receipt.receipt_pdf and not receipt.email_sent:
         mail = mailutils.prepare_email(
             receipt.email_to,
-            "Jacobs Alumni Association - Donation Receipt",
+            "Beyond the Pond Alumni Association - Donation Receipt",
             "emails/new_receipt.html",
             receipt=receipt,
         )

@@ -126,7 +126,7 @@ class ClientIdLoginView(views.LoginView):
 
                 mailutils.send_email(
                     user.email,
-                    "Jacobs Alumni Association - Login Link",
+                    "Beyond the Pond Alumni Association - Login Link",
                     "emails/token_email.html",
                     name=user.givenName,
                     login_url=abs_url,
