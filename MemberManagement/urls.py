@@ -27,7 +27,7 @@ urlpatterns = [
     path("healthcheck/static/", HealthCheckStatic.as_view(), name="healthcheck"),
     path(
         "imprint/",
-        RedirectView.as_view(url="https://jacobs-alumni.de/imprint/", permanent=False),
+        RedirectView.as_view(url="https://beyondthepondalumni.com/imprint/", permanent=False),
         name="imprint",
     ),
     # Root redirects
@@ -38,7 +38,7 @@ urlpatterns = [
     ),
     path(
         "privacy/",
-        RedirectView.as_view(url="https://jacobs-alumni.de/privacy/", permanent=False),
+        RedirectView.as_view(url="https://beyondthepondalumni.com/privacy/", permanent=False),
         name="privacy",
     ),
     path(
