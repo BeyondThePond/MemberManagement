@@ -1456,9 +1456,9 @@ isobject@^3.0.1:
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==
 
-"jacobs-alumni-style@https://github.com/JacobsAlumni/jacobs-alumni-style.git#v1.3.0":
+"jacobs-alumni-style@https://github.com/BeyondThePond/jacobs-alumni-style.git#v1.3.0":
   version "1.3.0"
-  resolved "https://github.com/JacobsAlumni/jacobs-alumni-style.git#35d6e6e85f53941e10fbcb1d2ac822864f7ceb7e"
+  resolved "https://github.com/BeyondThePond/jacobs-alumni-style.git#35d6e6e85f53941e10fbcb1d2ac822864f7ceb7e"
   dependencies:
     uikit "^3.6.21"
 
@@ -2376,9 +2376,9 @@ webpack-sources@^3.2.3:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
-"webpack4-bundle-tracker@https://github.com/JacobsAlumni/webpack-bundle-tracker#v0.4.2-portal":
+"webpack4-bundle-tracker@https://github.com/BeyondThePond/webpack-bundle-tracker#v0.4.2-portal":
   version "0.4.2-beta"
-  resolved "https://github.com/JacobsAlumni/webpack-bundle-tracker#31c25d22a6b09114eb9c682a13b18e2ace6978fd"
+  resolved "https://github.com/BeyondThePond/webpack-bundle-tracker#31c25d22a6b09114eb9c682a13b18e2ace6978fd"
   dependencies:
     deep-extend "^0.6.0"
     mkdirp "^0.5.1"

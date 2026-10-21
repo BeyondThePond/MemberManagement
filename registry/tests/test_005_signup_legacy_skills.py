@@ -24,7 +24,8 @@ class SkillsTest(IntegrationTest, StaticLiveServerTestCase):
         )
 
         self.assert_url_equal(
-            "setup_atlas", "Check that the user gets redirected to the atlas page"
+            "setup_membership",
+            "Check that the user gets redirected to the membership page",
         )
 
         skills = self.user.alumni.skills
@@ -52,7 +53,8 @@ class SkillsTest(IntegrationTest, StaticLiveServerTestCase):
         )
 
         self.assert_url_equal(
-            "setup_atlas", "Check that the user gets redirected to the atlas page"
+            "setup_membership",
+            "Check that the user gets redirected to the membership page",
         )
 
         skills = self.user.alumni.skills

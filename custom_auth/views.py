@@ -47,7 +47,13 @@ def email_token_login(request: HttpRequest) -> HttpResponse:
 
     if res is not None:
         login(request, res)
-        next_url = request.POST.get("next", settings.LOGIN_REDIRECT_URL)
+        next_url = request.POST.get("next") or settings.LOGIN_REDIRECT_URL
+        if not url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = settings.LOGIN_REDIRECT_URL
         return redirect(next_url)
     else:
         return render(request, "auth/token_login.html", context={"error": True})
@@ -120,7 +126,7 @@ class ClientIdLoginView(views.LoginView):
 
                 mailutils.send_email(
                     user.email,
-                    "Jacobs Alumni Association - Login Link",
+                    "Beyond the Pond Alumni Association - Login Link",
                     "emails/token_email.html",
                     name=user.givenName,
                     login_url=abs_url,

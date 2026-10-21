@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "membermanagement"
 version = "0.1.0"
-description = "The Django Application for managing Jacobs University Bremen Alumni Members."
+description = "The Django Application for managing Beyond the Pond Alumni Members."
 authors = ["Tom Wiesing <tkw01536@gmail.com>", "Leonhard Kuboschek <leo@kuboschek.me>"]
 license = "GPL3"
 package-mode = false
@@ -54,6 +54,7 @@ pytest-env = "^1.1.5"
 
 [tool.pytest.ini_options]
 norecursedirs = "node_modules"
+reruns = 2
 filterwarnings = """
     error
     ignore::pytest.PytestUnraisableExceptionWarning

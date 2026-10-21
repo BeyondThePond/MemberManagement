@@ -5,7 +5,7 @@ RUN git describe --always > /PORTAL_VERSION
 RUN echo "Saved version file containing '$(cat /PORTAL_VERSION)'"
 
 # image for building node dependencies
-FROM node:18-alpine AS frontend
+FROM node:24-alpine AS frontend
 
 RUN apk add --no-cache \
     git
@@ -14,13 +14,13 @@ RUN apk add --no-cache \
 ADD package.json /app/package.json
 ADD yarn.lock /app/yarn.lock
 WORKDIR /app/
-RUN yarn install
+RUN corepack yarn install --frozen-lockfile
 
 # install frontend scripts + build
 ADD tsconfig.json /app/tsconfig.json
 ADD webpack.config.js /app/webpack.config.js
 ADD assets/ /app/assets/
-RUN yarn build
+RUN corepack yarn build
 
 # image for python
 FROM python:3.13-alpine

@@ -299,9 +299,9 @@ div
         .uk-form-controls.uk-form-controls-text
           input#id_tos.uk-checkbox(name='tos' required='' type='checkbox' v-model='tos')
           |                 I confirm that I have read and agree to the 
-          a(href='https://jacobs-alumni.de/privacy/' target='_blank') Terms and Conditions
+          a(href='https://beyondthepondalumni.com/privacy/' target='_blank') Terms and Conditions
           | , the 
-          a(href='https://jacobs-alumni.de/charter' target='_blank') Charter
+          a(href='https://beyondthepondalumni.com/charter' target='_blank') Charter
           | , and the 
           a(href='https://www.jacobs-alumni.de/by-laws' target='_blank') Contributions By-Laws
           | .

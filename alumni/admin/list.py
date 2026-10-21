@@ -160,7 +160,7 @@ class AlumniListFilter:
         ("membership__tier", custom_titled_filter("Alumni Tier")),
         ("jacobs__transferOptout", custom_titled_filter("Data Transfer Optout")),
         ("atlas__included", custom_titled_filter("Included in Alumni Atlas")),
-        ("jacobs__degree", custom_titled_filter("Jacobs Degree")),
-        ("jacobs__graduation", custom_titled_filter("Jacobs Class")),
-        ("jacobs__major", custom_titled_filter("Jacobs Major")),
+        ("jacobs__degree", custom_titled_filter("University Degree")),
+        ("jacobs__graduation", custom_titled_filter("University Class")),
+        ("jacobs__major", custom_titled_filter("University Major")),
     )

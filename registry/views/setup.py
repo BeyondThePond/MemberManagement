@@ -341,13 +341,15 @@ class SocialSetup(SetupComponentView):
 
 class JacobsSetup(SetupComponentView):
     setup_name = "Alumni Data"
-    setup_subtitle = "tell us what you did at Jacobs"
+    setup_subtitle = (
+        "Tell us what you did at Constructor University, former Jacobs University"
+    )
     setup_form_class = JacobsForm
 
 
 class JobSetup(SetupComponentView):
     setup_name = "Professional Information"
-    setup_subtitle = "What did you do after Jacobs?"
+    setup_subtitle = "What did you do after studying at Constructor University, former Jacobs University?"
     setup_form_class = JobInformationForm
 
 
