@@ -14,6 +14,7 @@ webpack-stats.json
 
 # pytest
 .pytest_cache/
+downloaded_files/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
