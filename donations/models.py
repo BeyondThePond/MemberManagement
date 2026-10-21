@@ -96,7 +96,7 @@ def _maybe_email_donor(sender, instance: Donation, created, **kwargs):
 
     mail = mailutils.prepare_email(
         receipt_email,
-        "Jacobs Alumni Association - Thank You!",
+        "Beyond the Pond Alumni Association - Thank You!",
         "emails/donation_complete.html",
         object=instance,
         domain=domain,
