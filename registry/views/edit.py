@@ -87,7 +87,7 @@ def editViewFactory(
 
 edit = editViewFactory(None, AlumniForm, "General Information")
 address = editViewFactory("address", AddressForm, "Address")
-jacobs = editViewFactory("jacobs", JacobsForm, "Jacobs Data")
+jacobs = editViewFactory("jacobs", JacobsForm, "University Data")
 social = editViewFactory("social", SocialMediaForm, "Social Media")
 job = editViewFactory("job", JobInformationForm, "Job Information")
 skills = editViewFactory("skills", SkillsForm, "Education and Skills")

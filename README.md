@@ -2,7 +2,7 @@
 
 ![Build Status](https://github.com/BeyondThePond/MemberManagement/workflows/CI/badge.svg)
 
-The Django Application for managing Jacobs University Bremen Alumni Members.
+The Django Application for managing Beyond the Pond Alumni Members.
 
 In general it fulfills six purposes:
 

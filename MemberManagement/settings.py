@@ -157,8 +157,10 @@ GSUITE_ADMIN_USER = "admin@jacobs-alumni.de"
 GSUITE_ORG_PATH = "/Approved Alumni"
 GSUITE_PASS_LENGTH = 20
 
-GSUITE_EMAIL_WELCOME_SUBJECT = "Welcome to the Jacobs Alumni Association!"
-GSUITE_EMAIL_WELCOMEBACK_SUBJECT = "Welcome again to the Jacobs Alumni Association!"
+GSUITE_EMAIL_WELCOME_SUBJECT = "Welcome to the Beyond the Pond Alumni Association!"
+GSUITE_EMAIL_WELCOMEBACK_SUBJECT = (
+    "Welcome again to the Beyond the Pond Alumni Association!"
+)
 GSUITE_EMAIL_ALL = ["membership@jacobs-alumni.de"]
 
 AUTHENTICATION_BACKENDS = [

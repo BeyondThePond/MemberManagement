@@ -16,6 +16,8 @@ from payments.admin import MembershipInformationInline, SubscriptionInformationI
 
 
 class JacobsDataInline(admin.StackedInline):
+    verbose_name = "University Data"
+    verbose_name_plural = "University Data"
     extra = 0
     model = JacobsData
 
