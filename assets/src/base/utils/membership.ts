@@ -51,7 +51,7 @@ export const MemberTierDescriptions: Record<MemberTier, string> = {
     co: `
     <ul>
         <li>Your @jacobs-alumni.de email account is hosted on G Suite and comes with access to various apps as well as Google Drive space. </li>
-        <li>Voting rights in the General Assembly of the Jacobs Alumni Association. </li>
+        <li>Voting rights in the General Assembly of the Beyond the Pond Alumni Association. </li>
         <li>Eligibility as a mentee or mentor for 1 year mentoring program. </li>
         <li>Access to Career Counselling Services. </li>
         <li>Free access to career seminars and workshops (on campus). </li>
